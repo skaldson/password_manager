@@ -1,4 +1,3 @@
-import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -39,7 +38,7 @@ class TagInfo:
 class TagWidget(QWidget):
 
     signal_edit_tag = pyqtSignal(int, str, int)
-    signal_add_tag = pyqtSignal(str, int)
+    signal_add_tag = pyqtSignal(int, str, int)
     signal_delete_tag = pyqtSignal(int)
 
     def __init__(self, parent=None):
@@ -47,10 +46,11 @@ class TagWidget(QWidget):
 
         self.db_cursor = DBCursor.getInstance()
         self.tags_list = self.db_cursor.get_tag_and_colour
-        self.custom_tag_button = QPushButton(self)
-        self.custom_tag_button.clicked.connect(self.new_custom_tag)
-        self.tag_labels = self.init_tag_labels(len(self.tags_list))
-        self.setFixedHeight(25*len(self.tags_list) + 100)
+        self.timer_message = ""
+
+        self.init_add_tag_buttom()
+        self.tag_labels = [TagInfo() for i in range(len(self.tags_list))]
+        self.change_geometry()
 
         
     def get_tag_label_by_name(self, name):
@@ -59,12 +59,9 @@ class TagWidget(QWidget):
                 if k == name:
                     return self.tag_labels.index(i)
 
-    def init_tag_labels(self, amount):
-        temp_list = []
-        for i in range(amount):
-            temp_list.append(TagInfo())
-
-        return temp_list
+    def init_add_tag_buttom(self):
+        self.custom_tag_button = QPushButton(self)
+        self.custom_tag_button.clicked.connect(self.new_custom_tag)
 
     def change_geometry(self, height=None, width=None):
         tags_amount = len(self.tags_list)
@@ -73,7 +70,6 @@ class TagWidget(QWidget):
             height = height_coefficient*tags_amount + 100
         else:
             height = (height_coefficient + 5)*tags_amount + 100
-        print(height)
         self.setFixedHeight(height)
 
     def paintEvent(self, e):
@@ -134,22 +130,63 @@ class TagWidget(QWidget):
                     }
         element.tags_info = [tag_text, temp_dict]
 
-    def mouseDoubleClickEvent(self, event):
-        x_current = event.x()
-        y_current = event.y()
-        
-        for i in range(len(self.tag_labels)):
-            temp_dict = (self.tag_labels[i].tags_info)[0]
-            for k, v in temp_dict.items():
-                if v['rect'].contains(x_current, y_current):
-                    if self.tag_labels[i].is_pressed:
-                        self.tag_labels[i].is_pressed = False
+
+    def mousePressEvent(self, event):
+        self.timer_last = "click"
+
+    def mouseReleaseEvent(self, event):
+        if self.timer_last == "click":
+            self.x_pos, self.y_pos = event.x(), event.y()
+            QTimer.singleShot(QApplication.instance().doubleClickInterval(),
+                self.__performSingleClickAction)
+            temp = self.is_pressed_tag(self.x_pos, self.y_pos)
+            if temp.get('no_tag'):
+                return
+            else:
+                tag_index = temp['index']
+                if temp['answer']:
+                    if not self.tag_labels[tag_index].is_pressed:
+                        self.tag_labels[tag_index].is_pressed = True
                         self.repaint()
                     else:
-                        self.old_tag_info(self.tag_labels[i])
-                        self.edit_tag(k, v['colour'])
-                        self.tag_labels[i].is_pressed = True
+                        self.tag_labels[tag_index].is_pressed = False
                         self.repaint()
+        else:
+            self.timer_message = "Double Click"
+            self.update()
+
+    def __performSingleClickAction(self):
+        if self.timer_last == "click":
+            self.timer_message = "click"
+            self.update()
+
+    def is_pressed_tag(self, x_current, y_current):
+        for index in range(len(self.tag_labels)):
+            temp_dict = (self.tag_labels[index].tags_info)[0]
+            for tag_name, tag_info in temp_dict.items():
+                if tag_info['rect'].contains(x_current, y_current):
+                    return {'answer': True, 'index': index, 
+                            'tag_name': tag_name, 'tag_info': tag_info}
+        return {'no_tag': True}
+
+    def mouseDoubleClickEvent(self, event):
+        self.timer_last = "Doble click"
+
+        x_pos = event.x()
+        y_pos = event.y()
+        pressed_rect = self.is_pressed_tag(x_pos, y_pos)
+        if pressed_rect.get('no_tag'):
+            return
+        else:
+            tag_index = pressed_rect['index']
+            tag_name = pressed_rect['tag_name']
+            tag_info = pressed_rect['tag_info']
+
+            if pressed_rect['answer']:
+                self.old_tag_info(self.tag_labels[tag_index])
+                self.edit_tag(tag_name, tag_info['colour'])
+                self.tag_labels[tag_index].is_pressed = True
+                self.repaint()
 
     def edit_tag(self, tag_name, colour):
         self.tag_edit_window = TagWindow()
@@ -181,16 +218,21 @@ class TagWidget(QWidget):
             self.tag_labels.pop(tag_index)
 
     def delete_current_tag(self):
-        is_delete = YesNoWindow(self.tag_edit_window, 'Really delete this tag?')
-        if is_delete.yes_no():
-            colour_name = (self.db_cursor.get_colour_by_id(self.colour_id))[0][0]
-            tag_index = self.tags_list.index((self.del_tag_name, colour_name))
-            self.signal_delete_tag.emit(tag_index)
-            self.edit_tag_item(self.del_tag_name, colour_name, edit=False)
+        colour_name = (self.db_cursor.get_colour_by_id(self.colour_id))[0][0]
+        tag_index = self.tags_list.index((self.del_tag_name, colour_name))
+        if len(self.db_cursor.get_intermediate_tag_id(tag_index)) > 0:
+            InfoBox(self, window_name='Info', message="You can not remove this tag")
+            self.tag_labels[tag_index].is_pressed = False
             self.tag_edit_window.close()
-            self.repaint()
         else:
-            return
+            is_delete = YesNoWindow(self.tag_edit_window, 'Really delete this tag?')
+            if is_delete.yes_no():
+                self.signal_delete_tag.emit(tag_index)
+                self.edit_tag_item(self.del_tag_name, colour_name, edit=False)
+                self.tag_edit_window.close()
+                self.repaint()
+            else:
+                return
 
     # signal functions
     def edit_signal(self, new_name=None, new_colour=None):
@@ -236,19 +278,20 @@ class TagWidget(QWidget):
     def new_custom_tag(self):
         self.tag_window = TagWindow()
         self.tag_window.delete_button.hide()
-        self.tag_window.add_tag_signal.connect(self.init_new_tags)
+        self.tag_window.add_tag_signal.connect(self.init_new_tag)
         self.tag_window.setModal(True)
         self.tag_window.show()
 
-    def init_new_tags(self, tag_name, selected_colour):
+    def init_new_tag(self, tag_name, selected_colour):
         colour_name = self.db_cursor.get_colour_by_id(selected_colour)
         if self.is_unique_tag(self.tag_window, tag_name):
             self.tags_list.append((tag_name, colour_name[0][0]))
+            tag_index = len(self.tags_list)
             self.change_geometry()
             temp = TagInfo()
             temp.is_pressed = True
             self.tag_labels.append(temp)
-            self.signal_add_tag.emit(tag_name, selected_colour)
+            self.signal_add_tag.emit(tag_index, tag_name, selected_colour)
             self.repaint()
 
             self.tag_window.close()
@@ -258,11 +301,11 @@ class TagWidget(QWidget):
         pressed_tags_list = []
         for i in self.tag_labels:
             if i.is_checked:
-                pressed_tags_list.append(self.db_cursor)
+                pressed_tags_list.append(self.tag_labels.index(i) + 1)
         return pressed_tags_list
 
     def new_tag_button(self):
-        
+        x_pos, y_pos, button_w, button_h = int(self.width()/2) - int(self.width()/8), 30, 50, 30
         self.custom_tag_button.setText('+')
         button_style = """border-radius: 8px;
                             color: black;
@@ -270,4 +313,4 @@ class TagWidget(QWidget):
                             font-size: 16px;
                             border: 2px solid orange;"""
         self.custom_tag_button.setStyleSheet(button_style)
-        self.custom_tag_button.setGeometry(int(self.width()/2) - int(self.width()/8), 30, 50, 30)
+        self.custom_tag_button.setGeometry(x_pos, y_pos, button_w, button_h)

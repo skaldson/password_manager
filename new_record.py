@@ -45,7 +45,7 @@ class NewRecord(QDialog, new_record.Ui_new_record_dialog):
         self.show()        
 
     @property
-    def __names_login(self):
+    def user_records(self):
         temp_list = self.db_cursor.get_name_login
         names_login = []
         for i in temp_list:
@@ -54,8 +54,8 @@ class NewRecord(QDialog, new_record.Ui_new_record_dialog):
         return names_login
 
     def add_new_record(self):
-        names_login_list = self.__names_login
-        login_name, login, password = self.login_name.text(), self.new_login.text(), self.new_password.text()
+        names_login_list = self.user_records
+        login_name, login, password = self.new_name.text(), self.new_login.text(), self.new_password.text()
         tags = self.tag_widget.pressed_tags
 
         condition = True

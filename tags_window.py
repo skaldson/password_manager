@@ -31,7 +31,8 @@ class TagWindow(QDialog, tags_window.Ui_tags_window):
         self.tag_name.setText(tag_name)
         
         colour = current_tag[-1] + 1
-        self.set_colour_button(x_pos, y_pos, colour)
+        colour = (self.db_cursor.get_colour_by_id(colour))[0][0]
+        self.set_colour_button(x_pos, y_pos, colour, is_checked=True)
         
         self.show()
 
@@ -43,14 +44,14 @@ class TagWindow(QDialog, tags_window.Ui_tags_window):
 
         self.tag_submit.clicked.connect(self.add_tag_mode)
 
-    def set_colour_button(self, x_pos, y_pos, colour):
+    def set_colour_button(self, x_pos, y_pos, colour, is_checked=False):
         temp = QRadioButton()
-        temp.setChecked(True)
-        button_colour = (self.db_cursor.get_colour_by_id(colour))
+        temp.setChecked(True) if is_checked == True else temp.setChecked(False)
+
         temp.setStyleSheet("""QRadioButton {
                             height: 40px; width: 75px;
                             background-color: %s;
-                            border-radius: 8px;}""" % (button_colour))
+                            border-radius: 8px;}""" % (colour))
         self.colors_dict[temp] = colour
         self.colour_layout.addWidget(temp, x_pos, y_pos)
 
@@ -59,23 +60,25 @@ class TagWindow(QDialog, tags_window.Ui_tags_window):
         self.colour_layout.setColumnStretch(1, 4)
         self.colour_layout.setColumnStretch(2, 4)
 
-        colour_index = 0
         self.colors_dict = {}
+        colour_index = 0
         for x_pos in range((len(self.colors_list) // 3) + 1):
             for y_pos in range(3):
                 if colour_index == len(self.colors_list):
                     break
                 else:
                     temp_colour = self.colors_list[colour_index]
-                    self.set_colour_button(x_pos, y_pos, temp_colour)
+                    self.set_colour_button(x_pos, y_pos, temp_colour[0])
                 colour_index += 1
 
     def init_tag_data(self, signal):
         selected_colour = None
+        # print(self.colors_dict)
         for k, v in self.colors_dict.items():
             if k.isChecked():
-                selected_colour = v 
-        selected_colour += 1
+                selected_colour = (self.db_cursor.get_colour_by_name(v))[0][0]
+                # print(selected_colour)
+        # selected_colour += 1
 
         tag_name = self.tag_name.text()
         if tag_name == '':

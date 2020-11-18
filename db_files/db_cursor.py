@@ -79,18 +79,39 @@ class DBCursor:
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
+    
+    def get_intermediate_tag_id(self, tag_index):
+        tag_index += 1
+
+        query = """SELECT Tag_ID FROM `Intermediate` 
+                        WHERE `Tag_ID`='%s'""" % (tag_index)
+        self.db_cursor.execute(query)
+        
+        return self.db_cursor.fetchall()
+
+    def get_tags_by_login_name(self, login_name):
+        query = """SELECT `Tags`.Tag FROM `Tags` WHERE  `Tags`.`ID` IN 
+                    (SELECT `Tag_ID` FROM `Intermediate`, `Logins` 
+                        WHERE `Intermediate`.`Login_ID`=`Logins`.`ID`
+                            AND `Logins`.`Login_Name`='%s')""" % (login_name)
+
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
+
 
     @property
     def get_colors(self):
         query = """SELECT Colour.Colour FROM Colour"""
 
         self.db_cursor.execute(query)
+        # print(self.db_cursor.fetchall())
         return self.db_cursor.fetchall()
 
     def get_colour_by_id(self, colour_id):
-        query = """SELECT Colour.Colour FROM Colour WHERE Colour.ID=%s""" % (colour_id)
+        query = """SELECT Colour.Colour FROM Colour WHERE Colour.ID='%s'""" % (colour_id)
 
         self.db_cursor.execute(query)
+        # print(self.db_cursor.fetchall())
         return self.db_cursor.fetchall()
 
     def get_colour_by_name(self, colour_name):
@@ -124,10 +145,11 @@ class DBCursor:
             query = """INSERT INTO `Intermediate`(`Tag_ID`, `Login_ID`) VALUES
                         (%s, %s)""" % (i, login_id)
             self.db_cursor.execute(query)
-            self.db_connector.commit()
+        self.db_connector.commit()
 
-    def add_new_tag(self, tag_name, tag_colour):
-        query = """INSERT INTO `Tags` (`Tag`, `Colour_ID`) VALUES ('%s', '%s')""" % (tag_name, tag_colour)
+    def add_new_tag(self, tag_id, tag_name, tag_colour):
+        query = """INSERT INTO `Tags` (`ID`, `Tag`, `Colour_ID`) 
+                        VALUES ('%s', '%s', '%s')""" % (tag_id, tag_name, tag_colour)
 
         self.db_cursor.execute(query)
         self.db_connector.commit()

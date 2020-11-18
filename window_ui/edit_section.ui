@@ -54,7 +54,7 @@
   	padding: 20px;
   	text-align: center;
   	text-decoration: none;
-  	font-size: 16px;
+  	font-size: 20px;
   	margin: 0px 0px;
 }</string>
          </property>
@@ -104,7 +104,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="login_name_edit">
+      <widget class="QLineEdit" name="login_name">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -128,7 +128,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="login_edit">
+      <widget class="QLineEdit" name="login">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -139,24 +139,39 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Password</string>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scroll_tag_area">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>410</width>
+        <height>148</height>
+       </rect>
+      </property>
+      <widget class="EditTagWidget" name="edit_tag_widget" native="true">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>30</y>
+         <width>120</width>
+         <height>80</height>
+        </rect>
        </property>
       </widget>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QPushButton" name="sudmit_edit">
+      <widget class="QPushButton" name="sudmit_editing">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -168,7 +183,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel_edit">
+      <widget class="QPushButton" name="cancel_editing">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -183,6 +198,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EditTagWidget</class>
+   <extends>QWidget</extends>
+   <header>edit_tag_widget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

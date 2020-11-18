@@ -127,7 +127,7 @@ QPushButton:pressed {
      </layout>
     </item>
     <item>
-     <widget class="EditSection" name="edit_section_widget" native="true"/>
+     <widget class="EditSection" name="edit_section" native="true"/>
     </item>
    </layout>
   </widget>

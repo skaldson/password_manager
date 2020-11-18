@@ -3,14 +3,15 @@ from PyQt5.QtWidgets import *
 
 
 class InfoBox(QMessageBox):
-    def __init__(self, my_parent, message):
+    def __init__(self, my_parent, message, window_name='Incorrect Input'):
         super(InfoBox, self).__init__()
         self.my_parent = my_parent
         self.message = message
+        self.window_name = window_name
         self.correct_input()
 
     def correct_input(self):
-        message = QMessageBox.information(self.my_parent, 'Incorrect Input', self.message,
+        message = QMessageBox.information(self.my_parent, self.window_name, self.message,
                                                         QMessageBox.Ok)
 
         if message == QMessageBox.Ok:
