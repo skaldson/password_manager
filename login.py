@@ -33,7 +33,7 @@ class LoginWindow(QDialog, login_window.Ui_login_dialog):
     def init_edit_fields(self):
         self.login_password = PasswordEdit(self)
         self.login_password.set_style()
-        # self.login_password.setText('12345678')
+        self.login_password.setText('12345678')
         self.password_layout.addRow(QLabel('Password'), self.login_password)
         self.login_password_confirm = PasswordEdit(self)
         self.login_password_confirm.set_style()

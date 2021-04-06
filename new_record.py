@@ -11,6 +11,7 @@ from password_edit import PasswordEdit
 from tags_widget import TagWidget
 from message_boxes import InfoBox
 from tags_window import TagWindow
+from record_abs_class import RecordAbsClass
 
 
 class NewRecord(QDialog, new_record.Ui_new_record_dialog):
@@ -54,25 +55,15 @@ class NewRecord(QDialog, new_record.Ui_new_record_dialog):
         return names_login
 
     def add_new_record(self):
-        names_login_list = self.user_records
+        # names_login_list = self.user_records
         login_name, login, password = self.new_name.text(), self.new_login.text(), self.new_password.text()
         tags = self.tag_widget.pressed_tags
 
-        condition = True
-        if login and password and login_name:
-            if login_name in names_login_list:
-                condition = False
-                InfoBox(self, 'Such login already exist')
-            if len(password) < 8:
-                condition = False
-                InfoBox(self, 'Password must be at least 8 characters long')
-            if len(tags) > 3:
-                condition = False
-                InfoBox(self, 'No more than 3 tags')
-
-            if condition:
-                encrypted_password, urandom = cypher_func.text_encryptor(self.main_key, password)
-                encrypted_login = cypher_func.text_encryptor(self.main_key, login, urandom, False)
-
-                self.record_init_signal.emit(login_name, encrypted_login, encrypted_password, urandom, tags)
-                self.close()
+        abstract_record = RecordAbsClass(self, login_name, login, password, tags, self.main_key)
+        result_dict = abstract_record.result_forms_dict()
+        
+        if result_dict:
+            result_login, result_password = result_dict['login'], result_dict['password']
+            urandom = result_dict['urandom']
+            self.record_init_signal.emit(login_name, result_login, result_password, urandom, tags)
+            self.close()

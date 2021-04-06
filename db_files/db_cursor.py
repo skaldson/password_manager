@@ -64,6 +64,17 @@ class DBCursor:
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
+    def get_special_tag_and_colour(self, exceptions):
+        exceptions = str(exceptions)
+        exceptions = exceptions.replace('[', '(')
+        exceptions = exceptions.replace(']', ')')
+        query = """SELECT Tag, Colour.Colour FROM Tags, Colour 
+                            WHERE Tags.Colour_ID=Colour.ID
+                                AND Tag NOT IN %s""" % (exceptions)
+
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
+
 
     @property
     def get_last_id_login(self):
@@ -80,23 +91,30 @@ class DBCursor:
         return self.db_cursor.fetchall()
 
     
-    def get_intermediate_tag_id(self, tag_index):
-        tag_index += 1
-
-        query = """SELECT Tag_ID FROM `Intermediate` 
-                        WHERE `Tag_ID`='%s'""" % (tag_index)
-        self.db_cursor.execute(query)
+    def get_intermediate_tag_id(self, tag_name):
+        query = """SELECT Intermediate.Tag_ID FROM Tags, Intermediate WHERE 
+                    Tags.Id=Intermediate.Tag_ID
+                        AND Tags.Tag='%s'""" % (tag_name)
         
+        self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
     def get_tags_by_login_name(self, login_name):
-        query = """SELECT `Tags`.Tag FROM `Tags` WHERE  `Tags`.`ID` IN 
-                    (SELECT `Tag_ID` FROM `Intermediate`, `Logins` 
-                        WHERE `Intermediate`.`Login_ID`=`Logins`.`ID`
-                            AND `Logins`.`Login_Name`='%s')""" % (login_name)
+        query = """SELECT `Tags`.Tag, `Colour`.Colour FROM `Tags`, `Colour`
+                    WHERE  `Tags`.`ID` IN  (SELECT `Tag_ID` 
+                        FROM `Intermediate`, `Logins` WHERE 
+                            `Intermediate`.`Login_ID`=`Logins`.`ID` AND 
+                                `Logins`.`Login_Name`='%s')
+                                    AND `Tags`.Colour_ID=Colour.ID""" % (login_name)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
+
+    def get_tag_id_by_name(self, tag_name):
+        query = """SELECT Tags.ID FROM Tags WHERE Tags.Tag='%s'""" % (tag_name)
+
+        self.db_cursor.execute(query)
+        return (self.db_cursor.fetchall())[0][0]
 
 
     @property
@@ -120,15 +138,30 @@ class DBCursor:
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
-    @property
-    def get_full_user_info(self):
-        query = """SELECT Logins.Login_Name, Logins.Login, Logins.Password, Logins.Urandom, Colour.Colour as Colour, Tags.Tag 
-                        FROM Logins, Tags, Colour, Intermediate WHERE Intermediate.Login_ID=Logins.ID 
-                            AND Intermediate.Tag_ID=Tags.ID AND Tags.Colour_ID=Colour.ID """
+
+    def get_login_id(self, login_name):
+        query = """SELECT Logins.ID FROM `Logins` WHERE Logins.Login_Name='%s'""" % (login_name)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
+    # REWRITE!!!!!!
+    @property
+    def get_full_user_info(self):
+        query = """SELECT Logins.Login_Name, Logins.Login, Logins.Password, Logins.Urandom, Colour.Colour as Colour, Tags.Tag 
+                        FROM Logins, Tags, Colour"""
+        # WHERE Intermediate.Login_ID=Logins.ID 
+        #                    OR Intermediate.Tag_ID=Tags.ID OR Tags.Colour_ID=Colour.ID
+
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
+
+
+    def get_login_id_by_name(self, login_name):
+        query = """SELECT Logins.ID FROM `Logins` WHERE Logins.Login_Name='%s'""" % (login_name)
+
+        self.db_cursor.execute(query)
+        return (self.db_cursor.fetchall())[0][0]
 
     # manipulators
     def add_record_login(self, login_name, user_login, user_password, urandom):
@@ -138,48 +171,90 @@ class DBCursor:
         self.db_cursor.execute(query, (login_name, user_login, user_password, urandom))
         self.db_connector.commit()
 
-    def add_record_tag(self, tags):
-        login_id = (self.get_last_id_login + 1)
-        
+    def add_record_tag(self, login_name, tags):
+        login_id = self.get_login_id_by_name(login_name)
         for i in tags:
-            query = """INSERT INTO `Intermediate`(`Tag_ID`, `Login_ID`) VALUES
-                        (%s, %s)""" % (i, login_id)
+            current_tag_id = (self.get_tag_id_by_name(i))
+            query = """INSERT INTO `Intermediate` (Tag_ID, Login_ID) VALUES(%s, %s);""" % (current_tag_id, login_id)
             self.db_cursor.execute(query)
+        
         self.db_connector.commit()
 
-    def add_new_tag(self, tag_id, tag_name, tag_colour):
-        query = """INSERT INTO `Tags` (`ID`, `Tag`, `Colour_ID`) 
-                        VALUES ('%s', '%s', '%s')""" % (tag_id, tag_name, tag_colour)
+    def add_new_tag(self, tag_name, tag_colour):
+        query = """INSERT INTO `Tags` (`Tag`, `Colour_ID`) 
+                        VALUES ('%s', '%s')""" % (tag_name, tag_colour)
 
         self.db_cursor.execute(query)
         self.db_connector.commit()
 
     # edit tag
-    def edit_tag(self, tag_index, tag_name, tag_colour):
+    def edit_tag(self, old_name, new_name, tag_colour):
         
-        query = """UPDATE `Tags` SET `Tag`='%s', `Colour_ID`='%s' WHERE `ID`='%s'""" % (tag_name, tag_colour, tag_index)
+        query = """UPDATE `Tags` SET `Tag`='%s', `Colour_ID`='%s' 
+                    WHERE `Tag`='%s'""" % (new_name, tag_colour, old_name)
 
         self.db_cursor.execute(query)
         self.db_connector.commit()
 
-    def delete_tag(self, tag_index):
-        tag_index += 1
-        query = """DELETE FROM `Tags` WHERE `ID`='%s'""" % (tag_index)
+    def delete_tag(self, tag_name):
+        query = """DELETE FROM `Tags` WHERE `Tag`='%s'""" % (tag_name)
 
         self.db_cursor.execute(query)
-        self.reinit_tags_table()
-
-    
-    def reinit_tags_table(self):
-        query = """SELECT * FROM `Tags`"""
-        
-        tags_sqlite_obj = self.db_cursor.execute(query)
-        tags_content = tags_sqlite_obj.fetchall()
-        query_truncate = 'DELETE FROM Tags;'
-        self.db_cursor.execute(query_truncate)
         self.db_connector.commit()
-        
-        for i in range(len(tags_content)):
-            query_insert = """INSERT INTO `Tags` (`ID`, `Tag`, `Colour_ID`) VALUES (?, ?, ?)"""
-            self.db_cursor.execute(query_insert, (i+1, tags_content[i][1], tags_content[i][-1]))
+
+    def unselect_tag(self, tag_name):
+        tag_id = self.get_tag_id_by_name(tag_name)
+        query = """DELETE FROM `Intermediate` WHERE Tag_ID='%s'""" % (tag_id)
+
+        self.db_cursor.execute(query)
+        self.db_connector.commit()
+
+
+    def delete_login(self, login_id):
+        self.db_cursor.execute('BEGIN')
+        try:
+            self.db_cursor.execute("""DELETE FROM `Intermediate` WHERE Login_ID='%s'""" % (login_id))
+            self.db_cursor.execute("""DELETE FROM `Logins` WHERE ID='%s'""" % (login_id))
+        except sqlite3.Error:
+            print('failed!')
+            print('rollback!')
+
+        self.db_connector.commit()
+
+    def edit_login(self, login_name, login, password, urandom, old_name):
+        query = """UPDATE `Logins` SET `Login_Name`=?, `Login`=?, `Password`=?, `Urandom`=? 
+                            WHERE `Login_Name`=?"""
+        print(query)
+        self.db_cursor.execute(query, (login_name, login, password, urandom, old_name))
+        self.db_connector.commit()
+
+    def get_intermediate_rows_by_login_id(self, login_id):
+        query = """SELECT Tag_ID, Login_ID FROM `Intermediate` WHERE Login_ID='%s'""" % (login_id)
+
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
+
+    def update_intermediate(self, login_name, tags):
+        login_id = self.get_login_id_by_name(login_name)
+        available_tags = self.get_intermediate_rows_by_login_id(login_id)
+        print(login_id,': ', tags)
+        # print("FUCK1")
+        for i in tags:
+            tag_id = self.get_tag_id_by_name(i)
+            if available_tags:
+                print(available_tags)
+                temp = (tag_id, login_id)
+                if temp in available_tags:
+                    continue
+                else:
+                    query = """INSERT INTO `Intermediate` (Tag_ID, Login_ID) VALUES(%s, %s);""" % (tag_id, login_id)
+            else:
+                if [tag_id, login_id] in available_tags:
+                    continue
+                else:
+                    query = """INSERT INTO `Intermediate` (Tag_ID, Login_ID) VALUES(%s, %s);""" % (tag_id, login_id)
+
+            self.db_cursor.execute(query)   
+            # print(query)    
+
         self.db_connector.commit()

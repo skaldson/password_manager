@@ -11,6 +11,8 @@ from main_window import MainWindow
 
 def show_main_window():
     main_window.show()
+    shortcut_close = QShortcut(QKeySequence('Ctrl+Q'), main_window)
+    shortcut_close.activated.connect(lambda : main_window.close())
     main_window.init_main_key(login_window.get_main_key)
 
     

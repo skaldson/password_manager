@@ -28,7 +28,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
+           <width>900</width>
            <height>20</height>
           </size>
          </property>
@@ -49,9 +49,8 @@
          <property name="styleSheet">
           <string notr="true">QToolButton {
 	border-radius: 8px;
-	border: 2px solid red;
+	border: 2px solid orange;
   	color: black;
-  	padding: 20px;
   	text-align: center;
   	text-decoration: none;
   	font-size: 20px;
@@ -59,7 +58,7 @@
 }</string>
          </property>
          <property name="text">
-          <string>Close Editing</string>
+          <string>x</string>
          </property>
          <property name="iconSize">
           <size>
@@ -68,22 +67,6 @@
           </size>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
@@ -151,11 +134,11 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>410</width>
-        <height>148</height>
+        <width>406</width>
+        <height>169</height>
        </rect>
       </property>
-      <widget class="EditTagWidget" name="edit_tag_widget" native="true">
+      <widget class="TagWidget" name="tag_widget" native="true">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -171,6 +154,22 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Maximum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>150</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QPushButton" name="sudmit_editing">
        <property name="font">
         <font>
@@ -183,16 +182,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel_editing">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="text">
-        <string>Cancel</string>
+       <property name="sizeType">
+        <enum>QSizePolicy::Maximum</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>150</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -200,9 +203,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>EditTagWidget</class>
+   <class>TagWidget</class>
    <extends>QWidget</extends>
-   <header>edit_tag_widget</header>
+   <header>tags_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
