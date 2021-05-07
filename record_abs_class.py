@@ -26,12 +26,13 @@ def is_unique_name(name_list, name, main_window):
         return True
 
 class RecordAbsClass():
-    def __init__(self, main_window, login_name, login, password, tags):
+    def __init__(self, main_window, login_name, login, password, tags, old_name=None):
         self.main_window = main_window
         self.login_name = login_name
         self.login = login
         self.password = password
         self.tags = tags
+        self.old_name = old_name
         self.user_info = UserInfo.getInstance()
 
     def is_correct_forms(self, edit_section):
@@ -43,12 +44,14 @@ class RecordAbsClass():
             if not edit_section:
                 is_correct = is_unique_name(names_login_list, login_name, self.main_window)
             else:
-                names_login_list.append(login_name)
-                if names_login_list.count(login_name) > 1:
+                print(self.old_name)
+                if self.old_name == login_name:
                     is_correct = True
-                else:              
-                    names_login_list.remove(login_name)
-                    is_correct = is_unique_name(names_login_list, login_name, self.main_window)
+                else:
+                    names_login_list.append(login_name)
+                    is_correct = names_login_list.count(login_name) == 1
+                    if not is_correct:
+                        InfoBox(self.main_window, 'Such login already exist')
             if len(password) < 8:
                 is_correct = False
                 InfoBox(self.main_window, 'Password must be at least 8 characters long')

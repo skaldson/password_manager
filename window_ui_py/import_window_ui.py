@@ -15,6 +15,9 @@ class Ui_import_window(object):
     def setupUi(self, import_window):
         import_window.setObjectName("import_window")
         import_window.resize(244, 149)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        import_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(import_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.verticalLayout = QtWidgets.QVBoxLayout()

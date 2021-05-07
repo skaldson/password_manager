@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Password Manager</string>
+   <string>WardoLinx</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../images/download.png</normaloff>../images/download.png</iconset>
   </property>
   <widget class="QWidget" name="main_widget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -133,54 +137,63 @@ margin: 4px 2px;
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_new">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>New..</string>
     </property>
-    <widget class="QMenu" name="menuExport_Import">
-     <property name="title">
-      <string>Import/Export..</string>
-     </property>
-     <addaction name="action_pass_import"/>
-     <addaction name="action_pass_export"/>
-    </widget>
-    <addaction name="action_new_password"/>
-    <addaction name="menuExport_Import"/>
-    <addaction name="action_delete_user"/>
+    <addaction name="file_new_passwd"/>
+    <addaction name="file_del_user"/>
+    <addaction name="file_exit"/>
    </widget>
-   <widget class="QMenu" name="menuPreferences">
+   <widget class="QMenu" name="menu_import">
     <property name="title">
-     <string>Preferences</string>
+     <string>Import/Export</string>
     </property>
-    <addaction name="actionChange_Theme"/>
+    <widget class="QMenu" name="menuLocal">
+     <property name="title">
+      <string>Local</string>
+     </property>
+     <addaction name="local_imp"/>
+     <addaction name="local_exp"/>
+    </widget>
+    <widget class="QMenu" name="menuRemote_Sync">
+     <property name="title">
+      <string>Remote Sync.</string>
+     </property>
+     <widget class="QMenu" name="menuGoogle_Drive">
+      <property name="title">
+       <string>Google Drive</string>
+      </property>
+      <addaction name="action_drive_import"/>
+      <addaction name="action_drive_export"/>
+     </widget>
+     <addaction name="menuGoogle_Drive"/>
+    </widget>
+    <addaction name="menuLocal"/>
+    <addaction name="menuRemote_Sync"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionInformation"/>
+    <addaction name="help_about"/>
    </widget>
-   <addaction name="menu_new"/>
-   <addaction name="menuPreferences"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menu_file"/>
+   <addaction name="menu_import"/>
+   <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_new_password">
+  <action name="file_new_passwd">
    <property name="text">
     <string>New Password</string>
    </property>
   </action>
-  <action name="actionInformation">
+  <action name="help_about">
    <property name="text">
-    <string>Information</string>
+    <string>About</string>
    </property>
   </action>
-  <action name="actionChange_Theme">
-   <property name="text">
-    <string>Change Theme</string>
-   </property>
-  </action>
-  <action name="action_delete_user">
+  <action name="file_del_user">
    <property name="text">
     <string>Delete Account</string>
    </property>
@@ -193,6 +206,57 @@ margin: 4px 2px;
   <action name="action_pass_export">
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="local_import">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="action_drive_import">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="action_drive_export">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="local_export">
+   <property name="text">
+    <string>Im</string>
+   </property>
+  </action>
+  <action name="file_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="iconText">
+    <string>Exit</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="local_imp">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="local_exp">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="preference_theme">
+   <property name="text">
+    <string>Change Theme</string>
    </property>
   </action>
  </widget>

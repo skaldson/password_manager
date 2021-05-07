@@ -15,6 +15,9 @@ class Ui_tags_window(object):
     def setupUi(self, tags_window):
         tags_window.setObjectName("tags_window")
         tags_window.resize(333, 148)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        tags_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(tags_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.frame = QtWidgets.QFrame(tags_window)

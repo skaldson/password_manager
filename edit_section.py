@@ -7,6 +7,7 @@ from db_files.db_cursor import DBCursor
 from tag_info import TagInfo
 from password_edit import PasswordEdit
 from record_abs_class import RecordAbsClass
+from process_input import delete_rspace
 
 
 class EditSection(QWidget, edit_section.Ui_Form):
@@ -17,17 +18,15 @@ class EditSection(QWidget, edit_section.Ui_Form):
         super(EditSection, self).__init__()
         self.setupUi(self)
 
-        self.scroll_tag_area.setWidget(self.tag_widget)
         self.sudmit_editing.clicked.connect(self.submit_edit)
         self.tag_widget.set_edit_section_mode()
         self.db_cursor = DBCursor.getInstance()
         self.record_name = ''
-
         self.password_row()
         self.init_tags()
+        self.scroll_tag_area.setWidget(self.tag_widget)
         self.premordial_list = []
 
-    
     def password_row(self):
         self.password = PasswordEdit(self)
         self.password.set_style()
@@ -38,7 +37,8 @@ class EditSection(QWidget, edit_section.Ui_Form):
 
     def get_forms_values(self):
         tags = self.tag_widget.pressed_tags
-        login_name, login = self.login_name.text(), self.login.text()
+        login_name = delete_rspace(self.login_name.text())
+        login = delete_rspace(self.login.text())
         password = self.password.text()
 
         return [tags, login_name, login, password]
@@ -73,7 +73,8 @@ class EditSection(QWidget, edit_section.Ui_Form):
     def submit_edit(self):
         tags, login_name, login, password = self.get_forms_values()
 
-        abstract_record = RecordAbsClass(self, login_name, login, password, tags)
+        old_name = self.premordial_list[1]
+        abstract_record = RecordAbsClass(self, login_name, login, password, tags, old_name)
         result_dict = abstract_record.result_forms_dict(edit_section=True)
         
         if result_dict:

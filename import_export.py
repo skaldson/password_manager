@@ -8,6 +8,7 @@ import cypher_func
 from db_files.db_cursor import DBCursor
 from user_info import UserInfo
 from message_boxes import InfoBox
+from new_name_form import NewName
 
 
 def init_logins_dict():
@@ -48,7 +49,8 @@ def generate_json():
     global file_name
     file_name = user_info.user_name + '_records'
     with open(file_name, 'w') as login_str:
-        json.dump(logins_dict, login_str)
+        json.dump(logins_dict, login_str, indent=4)
+    return file_name
 
 def enctypt_user_records():
     generate_json()

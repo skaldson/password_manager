@@ -15,6 +15,9 @@ class Ui_greeting_window(object):
     def setupUi(self, greeting_window):
         greeting_window.setObjectName("greeting_window")
         greeting_window.resize(420, 470)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        greeting_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(greeting_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.image_layout = QtWidgets.QVBoxLayout()

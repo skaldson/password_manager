@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Add Tag</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../images/download.png</normaloff>../images/download.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QFrame" name="frame">

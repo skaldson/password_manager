@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, uic
 import window_ui_py.tags_window_py as tags_window
 from db_files.db_cursor import DBCursor
 from message_boxes import InfoBox
+from process_input import delete_rspace
 
 
 class TagWindow(QDialog, tags_window.Ui_tags_window):
@@ -73,17 +74,13 @@ class TagWindow(QDialog, tags_window.Ui_tags_window):
 
     def init_tag_data(self, signal):
         selected_colour = None
-        # print(self.colors_dict)
         for k, v in self.colors_dict.items():
             if k.isChecked():
                 selected_colour = (self.db_cursor.get_colour_by_name(v))[0][0]
-                # print(selected_colour)
-        # selected_colour += 1
 
-        tag_name = self.tag_name.text()
-        if tag_name == '':
-            InfoBox(self, 'Tag name must be at least 4 characters long')
-        elif selected_colour:
+        tag_name = delete_rspace(self.tag_name.text())
+        
+        if selected_colour:
             if len(tag_name) < 4:
                 InfoBox(self, 'Tag name must be at least 4 characters long')
             else:

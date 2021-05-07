@@ -15,6 +15,7 @@ from cypher_func import generate_hash
 # from main_window import MainWindow
 from binary_manipulators import *
 from user_info import UserInfo
+from process_input import delete_rspace
 
 
 class LoginWindowSerialize(QDialog, login_window.Ui_login_dialog):
@@ -53,7 +54,9 @@ class LoginSerialization(LoginWindowSerialize):
         self.login_password = PasswordEdit(self)
         self.login_password.set_style()
         self.password_layout.addRow(QLabel('Password'), self.login_password)
-
+        self.user_name.setText('wardgib')
+        self.login_password.setText('12345678')
+    
     @property
     def init_ui(self):
         self.photo_frame.hide()
@@ -139,7 +142,7 @@ class SignUpSerialization(LoginWindowSerialize):
     def sign_up(self):
         self.key = self.login_password.text()
         self.key_confirm = self.login_password_confirm.text()
-        self.name = self.user_name.text()
+        self.name = delete_rspace(self.user_name.text())
         try:
             user_photo = self.user_photo[0]
         except AttributeError:
@@ -277,7 +280,8 @@ class EditUserInfo(SignUpSerialization):
             pass
 
     def change_user_info(self):
-        user_name, user_key = self.user_name.text(), self.login_password.text()
+        user_name = delete_rspace(self.user_name.text())
+        user_key = self.login_password.text()
         identical_name = self.user_info.user_name == user_name
         identical_passwd = self.user_info.user_key == user_key
         identical_photo = self.user_info.user_photo == self.user_photo

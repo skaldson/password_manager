@@ -16,6 +16,9 @@ from custom_listwidget import CustomListWidget
 from user_info import UserInfo
 from tags_widget import TagWidget
 from new_name_form import NewName
+from google_drive_sync import DriveExport
+from drive_import import DriveImport
+from about_window import AboutWindow
 
 
 class MainWindow(QMainWindow, main_window.Ui_main_window):
@@ -24,14 +27,20 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
-
+        self.set_shortcuts()
         self.db_cursor = DBCursor.getInstance()
-
         self.init_functionality()
 
-    def init_functionality(self):
-        self.menu_new.triggered[QAction].connect(self.processtrigger_bar)
+    def set_shortcuts(self):
+        str_exit = 'CTRL+Q'
+        str_new_record = 'Ctrl+N'
+        self.file_exit.setShortcut(str_exit)
+        self.file_new_passwd.setShortcut(str_new_record)
 
+    def init_functionality(self):
+        self.menu_file.triggered[QAction].connect(self.process_file)
+        self.menu_import.triggered[QAction].connect(self.process_import)
+        self.menu_help.triggered[QAction].connect(self.process_help)
         self.close_editing()
 
         self.user_info_button.clicked.connect(self.init_user_window)
@@ -64,24 +73,47 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.switch_user_signal.emit()
         
 
-    def processtrigger_bar(self, trigger):
-        if trigger == self.action_new_password:
+    def process_file(self, trigger):
+        if trigger == self.file_new_passwd:
             self.create_new_record_window()
-        if trigger == self.action_delete_user:
+        if trigger == self.file_del_user:
             message = "Are you really want delete all data?"
             window_title = "Delete Account"
-            if YesNoWindow(self, title=window_title, message=message).yes_no():
-                # self.db_cursor.delete_user()
-                self.close()
-                self.switch_user()
+            self.delete_question = YesNoWindow(self, title=window_title, message=message)
+            answer = self.delete_question.yes_no()
+            if answer:
+                self.db_cursor.delete_user()
+                self.switch_user_signal.emit()
             else:
                 pass
-        if trigger == self.action_pass_export:
+        if trigger == self.file_exit:
+            self.close()
+
+    def process_import(self, trigger):
+        if trigger == self.local_exp:
             enctypt_user_records()
-        if trigger == self.action_pass_import:
+        if trigger == self.local_imp:
             self.imported_logins = decrypt_user_records(self)
             if self.imported_logins:
                 self.compare_logins_dict()
+        if trigger == self.action_drive_export:
+            self.drive_export = DriveExport()
+            self.drive_export.init_functionality()
+        if trigger == self.action_drive_import:
+            self.drive_window = DriveImport()
+            self.drive_window.file_content_signal.connect(self.remote_import)
+            self.drive_window.init_functionality() 
+
+    def process_help(self, trigger):
+        if trigger == self.help_about:
+            self.about = AboutWindow()
+            self.about.init_functionality()
+
+    def remote_import(self, file_content):
+        self.drive_window.close()
+        if file_content:
+            self.imported_logins = file_content
+            self.compare_logins_dict()
 
     def compare_logins_dict(self):
         first = self.logins_dict
@@ -106,18 +138,20 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.new_name_window.setWindowTitle(title)
         self.new_name_window.init_functionality()
 
-    def check_record_data(self, data_dict):
+    def check_record_data(self, data_dict, name=None):
         login = data_dict['login']
         passwd = data_dict['passwd']
         tags = data_dict['tags']
         colours = data_dict['colours']
-        TagWidget.check_tags(tags, colours)
+        print('tags', tags)
+        print('colour', colours)
+        TagWidget.check_tags(tags, colours, name)
         user_key = self.user_info.user_key
         enc_passwd, urandom = cypher_func.text_encryptor(user_key, passwd)
         enc_login = cypher_func.text_encryptor(user_key, login, urandom, False)
 
         return (enc_login, enc_passwd, urandom)
-    
+
     def submit_new_record(self, name, result_tuple, tags):
         enc_login, enc_passwd = result_tuple[0], result_tuple[1]
         urandom = result_tuple[-1]
@@ -132,10 +166,10 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
 
     def replace_login_value(self, name):
         tags = self.imported_logins[name]['tags']
-        result_tuple = self.check_record_data(self.imported_logins[name])
+        result_tuple = self.check_record_data(self.imported_logins[name], name)
         enc_login, enc_passwd = result_tuple[0], result_tuple[1]
         urandom = result_tuple[-1]
-        
+        print(tags)
         self.edit_record_info(name, name, enc_login, enc_passwd, urandom, tags)
         self.hide_update_editing()
 
@@ -167,6 +201,7 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.update_logins_list()
         self.user_info.user_photo = self.db_cursor.get_user_photo_by_id()
         set_user_photo(self.user_info.user_photo, self.user_info_button)
+        self.db_cursor.init_new_user_tags()
 
     # record window edit signal
     def edit_app_tag(self, old_name, new_name, tag_colour):
@@ -186,6 +221,7 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
     def update_logins_list(self):
         self.logins_list.clear()
         self.add_info_list_items()
+        self.close_editing()
 
     def init_logins_dict(self):
         self.logins_dict = init_logins_dict()

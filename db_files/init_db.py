@@ -45,7 +45,9 @@ class InItDb:
             `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
             `Tag` TEXT NOT NULL,
             `Colour_ID` INTEGER NOT NULL,
-            FOREIGN KEY(`Colour_ID`) REFERENCES `Colour`(`ID`));"""
+            `User_ID` INTEGER NOT NULL,
+            FOREIGN KEY(`Colour_ID`) REFERENCES `Colour`(`ID`)
+            FOREIGN KEY(`User_ID`) REFERENCES `Users`(`ID`));"""
 
         self.db_cursor.execute(query_create_table)
         self.db_connector.commit()
@@ -87,16 +89,16 @@ class InItDb:
         self.db_cursor.execute(query_insert)
         self.db_connector.commit()
 
-    def __insert_into_tags(self):
-        query_insert = """INSERT INTO `Tags`(`ID`, `Tag`, `Colour_ID`) VALUES
-                            (1, 'facebook', 3),
-                            (2, 'twitter', 3),
-                            (3, 'reddit', 2),
-                            (4, 'personal', 6),
-                            (5, 'mail', 1);"""
+    # def __insert_into_tags(self):
+    #     query_insert = """INSERT INTO `Tags`(`ID`, `Tag`, `Colour_ID`) VALUES
+    #                         (1, 'facebook', 3),
+    #                         (2, 'twitter', 3),
+    #                         (3, 'reddit', 2),
+    #                         (4, 'personal', 6),
+    #                         (5, 'mail', 1);"""
 
-        self.db_cursor.execute(query_insert)
-        self.db_connector.commit()
+    #     self.db_cursor.execute(query_insert)
+    #     self.db_connector.commit()
 
     # init program database
     def init_db(self):
@@ -107,7 +109,7 @@ class InItDb:
         self.__insert_into_colour()
         self.__create_tags_table()
         self.__create_intermediate_table()
-        self.__insert_into_tags()
+        # self.__insert_into_tags()
 
 
 def init_db():

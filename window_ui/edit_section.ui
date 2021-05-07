@@ -49,7 +49,7 @@
          <property name="styleSheet">
           <string notr="true">QToolButton {
 	border-radius: 8px;
-	border: 2px solid orange;
+	border: 2px solid red;
   	color: black;
   	text-align: center;
   	text-decoration: none;

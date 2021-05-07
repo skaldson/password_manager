@@ -15,6 +15,9 @@ class Ui_new_record_dialog(object):
     def setupUi(self, new_record_dialog):
         new_record_dialog.setObjectName("new_record_dialog")
         new_record_dialog.resize(347, 403)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        new_record_dialog.setWindowIcon(icon)
         self.verticalLayout = QtWidgets.QVBoxLayout(new_record_dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.new_login_layout = QtWidgets.QFormLayout()

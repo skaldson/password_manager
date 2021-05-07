@@ -12,6 +12,7 @@ from message_boxes import InfoBox
 from tags_window import TagWindow
 from record_abs_class import RecordAbsClass
 from user_info import UserInfo
+from process_input import delete_rspace
 
 
 class NewRecord(QDialog, new_record.Ui_new_record_dialog):
@@ -43,7 +44,9 @@ class NewRecord(QDialog, new_record.Ui_new_record_dialog):
         self.show()        
 
     def add_new_record(self):
-        login_name, login, password = self.new_name.text(), self.new_login.text(), self.new_password.text()
+        login_name = delete_rspace(self.new_name.text())
+        login = delete_rspace(self.new_login.text())
+        password = self.new_password.text()
         tags = self.tag_widget.pressed_tags
 
         abstract_record = RecordAbsClass(self, login_name, login, password, tags)

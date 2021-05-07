@@ -32,6 +32,25 @@ class DBCursor:
         self.db_cursor = self.db_connector.cursor()
         self.user_info = UserInfo.getInstance()
 
+    def init_new_user_tags(self):
+        user_id = self.user_info.user_id
+        query = """SELECT Tag FROM Tags WHERE User_ID='%s'""" % (user_id)
+        self.db_cursor.execute(query)
+        query_result = self.db_cursor.fetchall()
+
+        if not query_result:
+            query_insert = f"""INSERT INTO `Tags`(`Tag`, `Colour_ID`, `User_ID`) VALUES
+                                ('facebook', 3, {user_id}),
+                                ('twitter', 3, {user_id}),
+                                ('reddit', 2, {user_id}),
+                                ('personal', 6, {user_id}),
+                                ('mail', 1, {user_id});"""
+
+            self.db_cursor.execute(query_insert)
+            self.db_connector.commit()
+        else:
+            pass
+
     def add_new_user(self, name, key, image):
         urandom = os.urandom(16)
         query = """INSERT INTO `Users`(`Name`, `Key`, `Image`, `Urandom`) VALUES
@@ -77,31 +96,17 @@ class DBCursor:
         return (self.db_cursor.fetchall())[0][0]
 
     def get_user_urandom(self):
-        query = """SELECT Urandom FROM Users WHERE ID='%s'""" % (self.user_info.user_id)
+        user_id = self.user_info.user_id
+        query = """SELECT Urandom FROM Users WHERE ID='%s'""" % (user_id)
 
         self.db_cursor.execute(query)
         return (self.db_cursor.fetchall())[0][0]
 
     # getters
     @property
-    def get_main_key(self):
-        query = """SELECT `Parameter Value` FROM `Program Data`
-                    WHERE `Parameter`='key'"""
-
-        self.db_cursor.execute(query)
-        return self.db_cursor.fetchall()
-
-    @property
-    def get_tags_table(self):
-        query = """SELECT DISTINCT Tag FROM Tags"""
-
-        self.db_cursor.execute(query)
-        result = self.db_cursor.rowcount
-
-        return result
-    @property
     def get_tag_names(self):
-        query = """SELECT Tag FROM Tags"""
+        query = """SELECT Tag FROM Tags 
+            WHERE User_ID='%s'""" % (self.user_info.user_id)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
@@ -109,61 +114,63 @@ class DBCursor:
     @property
     def get_tag_and_colour(self):
         query = """SELECT Tag, Colour.Colour FROM Tags, Colour
-                            WHERE Tags.Colour_ID=Colour.ID"""
+                    WHERE Tags.Colour_ID=Colour.ID
+                        AND Tags.User_ID='%s'""" % (self.user_info.user_id)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
     def get_special_tag_and_colour(self, exceptions):
+        user_id = self.user_info.user_id
         exceptions = str(exceptions)
         exceptions = exceptions.replace('[', '(')
         exceptions = exceptions.replace(']', ')')
         query = """SELECT Tag, Colour.Colour FROM Tags, Colour
-                            WHERE Tags.Colour_ID=Colour.ID
-                                AND Tag NOT IN %s""" % (exceptions)
+                    WHERE Tags.Colour_ID=Colour.ID
+                    AND Tags.User_ID='%s'
+                    AND Tag NOT IN %s""" % (user_id, exceptions)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
-    @property
-    def get_last_id_login(self):
-        query = """SELECT * FROM `Logins`"""
-
-        self.db_cursor.execute(query)
-        return len(self.db_cursor.fetchall())
-
     def get_name_login(self):
-        query = """SELECT Logins.Login_Name FROM Logins, Users
-            WHERE Logins.User_ID=Users.ID
-                AND Logins.User_ID='%s'""" % (self.user_info.user_id,)
+        query = """SELECT Logins.Login_Name FROM Logins
+            WHERE Logins.User_ID='%s'""" % (self.user_info.user_id,)
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
     def get_intermediate_tag_id(self, tag_name):
+        data_tuple = (tag_name, self.user_info.user_id)
         query = """SELECT Intermediate.Tag_ID FROM Tags, Intermediate WHERE
                     Tags.Id=Intermediate.Tag_ID
-                        AND Tags.Tag='%s'""" % (tag_name)
+                        AND Tags.Tag='%s' AND Tags.User_ID='%s'""" % data_tuple
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
     def get_tags_by_login_name(self, login_name):
+        user_id = self.user_info.user_id
+        data_tuple = (login_name, user_id, user_id)
         query = """SELECT Tags.Tag, Colour.Colour FROM Tags, Colour
-                    WHERE Tags.ID IN  (SELECT Tag_ID FROM
-                        Intermediate, Logins WHERE
-                            Intermediate.Login_ID=Logins.ID AND
-                                Logins.Login_Name='%s') AND
-                                    Tags.Colour_ID=Colour.ID""" % (login_name)
+                    WHERE Tags.ID IN (SELECT Tag_ID FROM
+                    Intermediate, Logins WHERE
+                    Intermediate.Login_ID=Logins.ID AND
+                    Logins.Login_Name='%s' AND 
+                    Intermediate.User_ID='%s') AND
+                    Tags.Colour_ID=Colour.ID AND
+                    Tags.User_ID='%s'""" % data_tuple
 
         self.db_cursor.execute(query)
         return self.db_cursor.fetchall()
 
     def get_tag_id_by_name(self, tag_name):
-        query = """SELECT Tags.ID FROM Tags WHERE Tags.Tag='%s'""" % (tag_name)
+        data_tuple = (tag_name, self.user_info.user_id,)
+        query = """SELECT Tags.ID FROM Tags 
+            WHERE Tags.Tag='%s' AND Tags.User_ID='%s'""" % data_tuple
 
         self.db_cursor.execute(query)
-        return (self.db_cursor.fetchall())[0][0]
+        return self.db_cursor.fetchall()[0][0]
 
     @property
     def get_colors(self):
@@ -196,27 +203,29 @@ class DBCursor:
         return self.db_cursor.fetchall()
 
     def get_full_user_info(self):
-        query = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
+        user_id = self.user_info.user_id
+        query_inter = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
                     Logins.Urandom, Colour.Colour as Colour, Tags.Tag
                     FROM Logins, Colour, Intermediate, Tags WHERE Intermediate.Tag_ID=Tags.ID AND
 					Intermediate.Login_ID=Logins.ID AND Colour.ID IN (SELECT Colour.ID
 					FROM Colour INNER JOIN Tags ON Colour.ID=Tags.Colour_ID WHERE
-					Tags.ID=Intermediate.Tag_ID) AND Intermediate.User_ID='%s'""" % (self.user_info.user_id,)
+					Tags.ID=Intermediate.Tag_ID) AND Intermediate.User_ID='%s'""" % (user_id,)
 
-        self.db_cursor.execute(query)
-        result = self.db_cursor.fetchall()
-        if not result:
-            query = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
+        query_log = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
                     Logins.Urandom, 0 as Colour, 0 as Tags 
-                            FROM Logins WHERE Logins.User_ID='%s'""" % (self.user_info.user_id)
-            self.db_cursor.execute(query)
-            result = self.db_cursor.fetchall()
-        return result
+                    FROM Logins WHERE Logins.User_ID='%s' AND
+					Logins.ID NOT IN (SELECT Login_ID FROM Intermediate)""" % (user_id)
+
+        query = f"{query_inter} UNION {query_log}"
+        
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
 
     def get_login_id_by_name(self, login_name):
+        user_id = self.user_info.user_id
         query = """SELECT Logins.ID FROM `Logins`, `Users`
             WHERE Logins.User_ID=Users.ID AND Logins.Login_Name='%s'
-                AND Logins.User_ID='%s'""" % (login_name, self.user_info.user_id,)
+                AND Logins.User_ID='%s'""" % (login_name, user_id,)
 
         self.db_cursor.execute(query)
         return (self.db_cursor.fetchall())[0][0]
@@ -230,10 +239,10 @@ class DBCursor:
 
     # manipulators
     def add_record_login(self, login_name, user_login, user_password, urandom):
+        user_id = self.user_info.user_id
         query = """INSERT INTO Logins(Login_Name, Login,
                                         Password, Urandom, User_ID)
                                             VALUES(?, ?, ?, ?, ?)"""
-        user_id = self.user_info.user_id
         data_tuple = (login_name, user_login, user_password, urandom, user_id,)
 
         self.db_cursor.execute(query, data_tuple)
@@ -241,33 +250,39 @@ class DBCursor:
 
     def add_record_tag(self, login_name, tags):
         login_id = self.get_login_id_by_name(login_name)
-        for i in tags:
-            current_tag_id = (self.get_tag_id_by_name(i))
-            query = """INSERT INTO `Intermediate`
-                    (Tag_ID, Login_ID, User_ID) VALUES(?, ?, ?);"""
-            data_tuple = (current_tag_id, login_id, self.user_info.user_id,)
-            self.db_cursor.execute(query, data_tuple)
+        user_id = self.user_info.user_id
+        if tags[0] == 0:
+            pass
+        else:
+            for i in tags:
+                current_tag_id = (self.get_tag_id_by_name(i))
+                query = """INSERT INTO `Intermediate`
+                        (Tag_ID, Login_ID, User_ID) VALUES(?, ?, ?);"""
+                data_tuple = (current_tag_id, login_id, user_id,)
+                self.db_cursor.execute(query, data_tuple)
 
-        self.db_connector.commit()
+            self.db_connector.commit()
 
     def add_new_tag(self, tag_name, tag_colour):
-        query = """INSERT INTO `Tags` (`Tag`, `Colour_ID`)
-                        VALUES ('%s', '%s')""" % (tag_name, tag_colour)
+        data_tuple = (tag_name, tag_colour, self.user_info.user_id)
+        query = """INSERT INTO `Tags` (`Tag`, `Colour_ID`, `User_ID`)
+                        VALUES ('%s', '%s', '%s')""" % data_tuple
 
         self.db_cursor.execute(query)
         self.db_connector.commit()
 
     # edit tag
     def edit_tag(self, old_name, new_name, tag_colour):
-
-        query = """UPDATE `Tags` SET Tag=?, Colour_ID=? WHERE Tag=?"""
-        data_tuple = (new_name, tag_colour, old_name,)
+        query = """UPDATE `Tags` SET Tag=?, Colour_ID=? 
+                    WHERE Tag=? AND User_ID=?"""
+        data_tuple = (new_name, tag_colour, old_name, self.user_info.user_id)
 
         self.db_cursor.execute(query, data_tuple)
         self.db_connector.commit()
 
     def delete_tag(self, tag_name):
-        query = """DELETE FROM Tags WHERE Tag='%s'""" % (tag_name)
+        query = """DELETE FROM Tags WHERE Tag='%s' 
+                    AND User_ID='%s'""" % (tag_name, self.user_info.user_id)
 
         self.db_cursor.execute(query)
         self.db_connector.commit()
@@ -322,11 +337,22 @@ class DBCursor:
         self.db_cursor.execute(query, data_tuple)
         return self.db_cursor.fetchall()
 
+    def delete_login_from_intermediate(self, name):
+        login_id = self.get_login_id_by_name(name)
+        data_tuple = (login_id, self.user_info.user_id)
+        query = """DELETE FROM Intermediate WHERE
+                    Login_ID='%s' AND User_ID='%s'""" % data_tuple
+
+        self.db_cursor.execute(query)
+        self.db_connector.commit()           
+
     def update_intermediate(self, login_name, tags):
         login_id = self.get_login_id_by_name(login_name)
         available_tags = self.get_intermediate_rows_by_user_id(login_id)
 
         for i in tags:
+            if i == 0:
+                break
             tag_id = self.get_tag_id_by_name(i)
             if available_tags:
                 temp = (tag_id, login_id)
@@ -368,17 +394,21 @@ class DBCursor:
     def delete_user(self):
         query_intrmd_del = """DELETE FROM Intermediate WHERE User_ID=?"""
         query_logins_del = """DELETE FROM Logins WHERE User_ID=?"""
+        query_tags_del = """DELETE FROM Tags WHERE User_ID=?"""
         query_user_del = """DELETE FROM Users WHERE ID=?"""
         data_tuple = (self.user_info.user_id,)
 
         self.db_cursor.execute('BEGIN')
-        # try:
-        query_list = [query_intrmd_del, query_logins_del, query_user_del]
+        try:
+            query_list = [query_intrmd_del, 
+                            query_logins_del,
+                            query_tags_del,
+                            query_user_del]
 
-        for query in query_list:
-            self.db_cursor.execute(query, data_tuple)
+            for query in query_list:
+                self.db_cursor.execute(query, data_tuple)
 
-        # except sqlite3.Error:
-        #     print('failed!\nrollback!')
+        except sqlite3.Error:
+            print('failed!\nrollback!')
 
-        # self.db_connector.commit()
+        self.db_connector.commit()

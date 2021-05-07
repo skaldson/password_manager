@@ -15,6 +15,9 @@ class Ui_new_name_window(object):
     def setupUi(self, new_name_window):
         new_name_window.setObjectName("new_name_window")
         new_name_window.resize(256, 94)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        new_name_window.setWindowIcon(icon)
         self.verticalLayout = QtWidgets.QVBoxLayout(new_name_window)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()

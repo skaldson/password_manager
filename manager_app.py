@@ -35,15 +35,14 @@ class Uroboros:
         self.welcome_window.get_user_id_signal.disconnect()
         self.welcome_window.accepted.disconnect()
         self.welcome_window.close()
-        shortcut_close = QShortcut(QKeySequence('Ctrl+Q'), self.main_window)
-        shortcut_close.activated.connect(lambda: self.main_window.close())
 
     def init_user(self, user_id, user_name, user_key):
         self.main_window.init_user_info(user_id, user_name, user_key)
 
     def restart_app(self):
         self.main_window.close()
-        
+        self.main_window.disconnect()
+        # self.welcome_window.disconnect()
         self.main_window = None
         self.welcome_window = None
         self.init_members()

@@ -10,7 +10,7 @@ from tag_info import TagInfo
 
 class TagWidget(QWidget):
 
-    signal_edit_tag = pyqtSignal(str, str, int, int)
+    signal_edit_tag = pyqtSignal(str, str, int)
     signal_add_tag = pyqtSignal(str, int)
     signal_delete_tag = pyqtSignal(str)
 
@@ -40,20 +40,26 @@ class TagWidget(QWidget):
         self.__tags[tag_tuple[0]] = tag_tuple[-1]
 
     @classmethod
-    def check_tags(cls, tags, colours):
+    def check_tags(cls, tags, colours, login_name=None):
         db_cursor = DBCursor.getInstance()
         exist_tags = db_cursor.get_tag_names
         tags_list = []
         for i in exist_tags:
             tags_list.append(i[0])
-        for i in tags:
-            if i in tags_list:
+        if tags[0] == 0:
+            if login_name != None:
+                db_cursor.delete_login_from_intermediate(login_name)
+        else:
+            for i in tags:
                 colour = colours[tags.index(i)]
                 colour_id = db_cursor.get_colour_by_name(colour)
+                
                 colour_id = colour_id[0][0]
-                db_cursor.edit_tag(i, i, colour_id)
-            elif i not in tags_list:
-                db_cursor.add_new_tag(i, colour_id)
+                print(colour, colour_id)
+                if i in tags_list:
+                    db_cursor.edit_tag(i, i, colour_id)
+                elif i not in tags_list:
+                    db_cursor.add_new_tag(i, colour_id)
 
     def set_edit_section_mode(self):
         self.edit_section_mode = True
@@ -80,13 +86,13 @@ class TagWidget(QWidget):
         self.custom_tag_button = QPushButton(self)
         self.custom_tag_button.setText('+')
         button_style = """border-radius: 8px; color: black; text-align: center;
-                            font-size: 16px; border: 2px solid orange;"""
+                            font-size: 16px; border: 2px solid black;"""
         self.custom_tag_button.setStyleSheet(button_style)
         self.custom_tag_button.clicked.connect(self.new_custom_tag)
 
     def change_geometry(self, height=None, width=None):
         tags_amount = self.tag_amount
-        height_coefficient = 35
+        height_coefficient = 15
         if tags_amount % 2:
             height = height_coefficient*tags_amount + 100
         else:
@@ -110,7 +116,8 @@ class TagWidget(QWidget):
         check_tags.update(noncheck_tags)
         font_metrics = QFontMetrics(text_font)
         all_text_width = 0
-        x_pos, y_pos, abscissa_shift = 10, 100, 50
+        start_x = 30
+        x_pos, y_pos, abscissa_shift = start_x, 70, 35
 
         for tag_name, tag_info in check_tags.items():
             tag_text = tag_name
@@ -139,8 +146,8 @@ class TagWidget(QWidget):
                                         'rect_param': [x_pos, y_pos-tag_height, tag_width, tag_width]
                                     }
             all_text_width += tag_width
-            if (all_text_width + self.width()/2 + 40) > self.width():
-                x_pos = 10
+            if (all_text_width + self.width()/2 + 20) > self.width():
+                x_pos = start_x
                 y_pos += tag_height + 40
                 all_text_width = 0
             else:
@@ -306,6 +313,6 @@ class TagWidget(QWidget):
         return pressed_tags_list
 
     def set_pos_for_tag_butn(self):
-        x_pos = int(self.width()/2) - int(self.width()/8)
-        y_pos, button_w, button_h = 30, 50, 30
+        x_pos = int(self.width()/2) - int(self.width()/10)
+        y_pos, button_w, button_h = 0, 50, 30
         self.custom_tag_button.setGeometry(x_pos, y_pos, button_w, button_h)
