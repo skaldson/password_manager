@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>main_window</class>
+ <widget class="QMainWindow" name="main_window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>775</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>WardoLinx</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../images/download.png</normaloff>../images/download.png</iconset>
+  </property>
+  <widget class="QWidget" name="main_widget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QToolButton" name="user_info_button">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolButton{
+background-color: #D0D3D4;
+border-radius:20%;
+color: black;
+padding: 15px;
+margin: 4px 2px;
+}</string>
+        </property>
+        <property name="text">
+         <string>U</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QListWidget" name="logins_list">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="viewMode">
+           <enum>QListView::ListMode</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>400</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0" colspan="2">
+         <widget class="EditSection" name="edit_section" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>100</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>775</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_file">
+    <property name="title">
+     <string>New..</string>
+    </property>
+    <addaction name="file_new_passwd"/>
+    <addaction name="file_del_user"/>
+    <addaction name="file_exit"/>
+   </widget>
+   <widget class="QMenu" name="menu_import">
+    <property name="title">
+     <string>Import/Export</string>
+    </property>
+    <widget class="QMenu" name="menuLocal">
+     <property name="title">
+      <string>Local</string>
+     </property>
+     <addaction name="local_imp"/>
+     <addaction name="local_exp"/>
+    </widget>
+    <widget class="QMenu" name="menuRemote_Sync">
+     <property name="title">
+      <string>Remote Sync.</string>
+     </property>
+     <widget class="QMenu" name="menuGoogle_Drive">
+      <property name="title">
+       <string>Google Drive</string>
+      </property>
+      <addaction name="action_drive_import"/>
+      <addaction name="action_drive_export"/>
+     </widget>
+     <addaction name="menuGoogle_Drive"/>
+    </widget>
+    <addaction name="menuLocal"/>
+    <addaction name="menuRemote_Sync"/>
+   </widget>
+   <widget class="QMenu" name="menu_help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="help_about"/>
+   </widget>
+   <addaction name="menu_file"/>
+   <addaction name="menu_import"/>
+   <addaction name="menu_help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="file_new_passwd">
+   <property name="text">
+    <string>New Password</string>
+   </property>
+  </action>
+  <action name="help_about">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="file_del_user">
+   <property name="text">
+    <string>Delete Account</string>
+   </property>
+  </action>
+  <action name="action_pass_import">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="action_pass_export">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="local_import">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="action_drive_import">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="action_drive_export">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="local_export">
+   <property name="text">
+    <string>Im</string>
+   </property>
+  </action>
+  <action name="file_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="iconText">
+    <string>Exit</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="local_imp">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="local_exp">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="preference_theme">
+   <property name="text">
+    <string>Change Theme</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EditSection</class>
+   <extends>QWidget</extends>
+   <header>edit_section</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
