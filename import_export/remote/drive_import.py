@@ -82,7 +82,6 @@ class DriveImport(QDialog, drive_export.Ui_drive_window):
 
     def submit_user_choose(self):
         if self.file_data:
-            print('here')
             result = dict(ast.literal_eval(self.file_data))
             self.file_content_signal.emit(result)
 
@@ -99,7 +98,6 @@ class DriveImport(QDialog, drive_export.Ui_drive_window):
         except FileNotFoundError:
             time.sleep(2)
             self.file_data = self.read_user_data(file_name)
-            print(file_name, 'exception FileNotFound')
 
         if file_name != self.clicked_filename and self.clicked_filename != '':
             os.remove(self.clicked_filename)

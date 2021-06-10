@@ -77,3 +77,4 @@ manager_env
 
 # crypto
 client_secret.json
+Logins.db

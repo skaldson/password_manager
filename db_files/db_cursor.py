@@ -202,14 +202,17 @@ class DBCursor:
         self.db_cursor.execute(query, data_tuple)
         return self.db_cursor.fetchall()
 
-    def get_full_user_info(self):
+    def get_full_user_info(self, tag_filter=False):
         user_id = self.user_info.user_id
         query_inter = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
                     Logins.Urandom, Colour.Colour as Colour, Tags.Tag
                     FROM Logins, Colour, Intermediate, Tags WHERE Intermediate.Tag_ID=Tags.ID AND
-					Intermediate.Login_ID=Logins.ID AND Colour.ID IN (SELECT Colour.ID
-					FROM Colour INNER JOIN Tags ON Colour.ID=Tags.Colour_ID WHERE
-					Tags.ID=Intermediate.Tag_ID) AND Intermediate.User_ID='%s'""" % (user_id,)
+                    Intermediate.Login_ID=Logins.ID AND Colour.ID IN (SELECT Colour.ID
+                    FROM Colour INNER JOIN Tags ON Colour.ID=Tags.Colour_ID WHERE
+                    Tags.ID=Intermediate.Tag_ID) AND Intermediate.User_ID='%s'""" % (user_id,)
+        if tag_filter:
+            query_inter += " AND Tags.Tag IN " + str(tag_filter)
+            print(query_inter)
 
         query_log = """SELECT Logins.Login_Name, Logins.Login, Logins.Password,
                     Logins.Urandom, 0 as Colour, 0 as Tags 
@@ -299,6 +302,25 @@ class DBCursor:
 
         self.db_cursor.execute(query, data_tuple)
         self.db_connector.commit()
+
+    def get_user_tags(self):
+        user_id = self.user_info.user_id
+        query = """SELECT DISTINCT Tags.Tag FROM Tags INNER JOIN 
+                    Intermediate ON Tags.ID=Intermediate.Tag_ID 
+                        WHERE Intermediate.User_ID='%s'""" % (user_id)
+
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()
+
+    def get_tag_colour(self, tag_name):
+        user_id = self.user_info.user_id
+        data_tuple = (tag_name, user_id)
+        query = """SELECT Colour.Colour FROM Tags INNER JOIN Colour
+                    ON Tags.Colour_ID=Colour.ID WHERE Tags.Tag='%s'
+                    AND Tags.User_ID=%s""" % data_tuple
+        
+        self.db_cursor.execute(query)
+        return self.db_cursor.fetchall()[0][0]
 
     def delete_user_record(self, login_id):
         self.db_cursor.execute('BEGIN')

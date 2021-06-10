@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window_ui/drive_export_window.ui'
+# Form implementation generated from reading ui file './window_ui/drive_export_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -16,7 +16,7 @@ class Ui_drive_window(object):
         drive_window.setObjectName("drive_window")
         drive_window.resize(536, 300)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         drive_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(drive_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -29,7 +29,7 @@ class Ui_drive_window(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 248, 236))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 252, 246))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -65,16 +65,6 @@ class Ui_drive_window(object):
 
     def retranslateUi(self, drive_window):
         _translate = QtCore.QCoreApplication.translate
-        drive_window.setWindowTitle(_translate("drive_window", "Drive Export"))
+        drive_window.setWindowTitle(_translate("drive_window", "Drive Import"))
         self.file_content.setText(_translate("drive_window", "TextLabel"))
         self.submit_button.setText(_translate("drive_window", "Submit"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    drive_window = QtWidgets.QDialog()
-    ui = Ui_drive_window()
-    ui.setupUi(drive_window)
-    drive_window.show()
-    sys.exit(app.exec_())

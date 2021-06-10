@@ -23,6 +23,7 @@ from import_export.remote.drive_export import DriveExport
 from import_export.remote.drive_import import DriveImport
 from import_export.local.local_import import LocalImport
 from windows.about.about_window import AboutWindow
+from widgets.tags_tool import TagsTool
 
 
 class MainWindow(QMainWindow, main_window.Ui_main_window):
@@ -33,13 +34,16 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.setupUi(self)
         self.set_shortcuts()
         self.db_cursor = DBCursor.getInstance()
+        self.tags_filter = dict()
         self.init_functionality()
 
     def set_shortcuts(self):
         str_exit = 'CTRL+Q'
         str_new_record = 'Ctrl+N'
+        str_help = 'Ctrl+H'
         self.file_exit.setShortcut(str_exit)
         self.file_new_passwd.setShortcut(str_new_record)
+        self.help_about.setShortcut(str_help)
 
     def init_functionality(self):
         self.menu_file.triggered[QAction].connect(self.process_file)
@@ -61,6 +65,64 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.edit_section.tag_widget.signal_delete_tag.connect(tag_sgn['del'])
         self.edit_section.tag_widget.signal_unselect_tag.connect(tag_sgn['unselect'])
 
+
+    def init_tags_list(self):
+        checked_tags = self.db_cursor.get_user_tags()
+        self.tags_tooltip.clear()
+        for tag in checked_tags:
+            name = tag[0]
+            tag_colour = self.db_cursor.get_tag_colour(name)
+            temp = TagsTool(name)
+            tag_text = "<img src='./images/tags.png'>  " + name
+            temp.widget_label.setText(tag_text)
+            if name not in self.tags_filter:
+                temp.widget_label.setStyleSheet("QLabel {\n"
+                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "color: %s;\n"
+                                        "}" % tag_colour)
+            elif self.tags_filter[name]:
+                temp.widget_label.setStyleSheet("QLabel {\n"
+                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "font-weight: bold;\n"
+                                        "color: %s;\n"
+                                        "}" % tag_colour)
+            else:
+                temp.widget_label.setStyleSheet("QLabel {\n"
+                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "font-weight: normal;\n"
+                                        "color: %s;\n"
+                                        "}" % tag_colour)
+            temp.doubleclick_item_signal.connect(self.set_tag_filter)
+            temp_list_widget = QListWidgetItem(self.tags_tooltip)
+            temp_list_widget.setSizeHint(temp.sizeHint())
+            self.tags_tooltip.addItem(temp_list_widget)
+            self.tags_tooltip.setItemWidget(temp_list_widget, temp)
+    
+    def init_tag_filter(self):
+        tags_filter = list()
+        for key, value in self.tags_filter.items():
+            if value == True:
+                tags_filter.append(key)
+        tags_filter = tuple(tags_filter)
+        if len(tags_filter) == 0:
+            return False
+        else:
+            if len(tags_filter) == 1:
+                tags_filter = str(tags_filter)[:-2] + ')'
+            else:
+                tags_filter = str(tags_filter)[:-1] + ')'
+        return tags_filter
+        
+
+    def set_tag_filter(self, name):
+        if name not in self.tags_filter:
+            self.tags_filter.setdefault(name, True)
+        elif self.tags_filter[name]:
+            self.tags_filter[name] = False
+        else:
+            self.tags_filter[name] = True
+        self.reinit_records()
+
     def init_user_window(self):
         self.login_serializer = LoginSerialize()
         self.login_serializer.window_mode = 2
@@ -78,6 +140,11 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
     def switch_user(self):
         self.switch_user_signal.emit()
         
+    def reinit_records(self):
+        self.init_tags_list()
+        tags_filter = self.init_tag_filter()
+        self.update_logins_list(tags_filter)
+
 
     def process_file(self, trigger):
         if trigger == self.file_new_passwd:
@@ -144,7 +211,6 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
     def unconflict_record(self, name):
         init_data = self.imported_logins[name]
         tags = self.imported_logins[name]['tags']
-        print(tags)
         result_tuple = self.check_record_data(init_data)
 
         self.submit_new_record(name, result_tuple, tags)
@@ -161,8 +227,6 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         passwd = data_dict['passwd']
         tags = data_dict['tags']
         colours = data_dict['colours']
-        print('tags', tags)
-        print('colour', colours)
         TagWidget.check_tags(tags, colours, name)
         user_key = self.user_info.user_key
         enc_passwd, urandom = ciphers.text_encryptor(user_key, passwd)
@@ -175,12 +239,14 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         urandom = result_tuple[-1]
         self.new_user_record(name, enc_login, enc_passwd, urandom, tags)
         self.hide_update_editing()
+        self.reinit_records()
 
     def init_new_record_name(self, name):
         tags = self.imported_logins[self.old_record_name]['tags']
         record_data = self.imported_logins[self.old_record_name]
         result_tuple = self.check_record_data(record_data)
         self.submit_new_record(name, result_tuple, tags)
+        self.reinit_records()
 
     def replace_login_value(self, name):
         tags = self.imported_logins[name]['tags']
@@ -189,6 +255,7 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         urandom = result_tuple[-1]
         self.edit_record_info(name, name, enc_login, enc_passwd, urandom, tags)
         self.hide_update_editing()
+        self.reinit_records()
 
     def hide_update_editing(self):
         self.update_logins_list()
@@ -219,13 +286,19 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
         self.user_info.user_photo = self.db_cursor.get_user_photo_by_id()
         set_user_photo(self.user_info.user_photo, self.user_info_button)
         self.db_cursor.init_new_user_tags()
+        self.init_tags_list()
+
 
     # record window edit signal
     def edit_app_tag(self, old_name, new_name, tag_colour):
         self.db_cursor.edit_tag(old_name, new_name, tag_colour)
+        self.init_tags_list()
+        self.reinit_records()
 
     def add_new_tag(self, tag_name, tag_colour):
         self.db_cursor.add_new_tag(tag_name, tag_colour)
+        self.init_tags_list()
+        # self.reinit_records()
 
     def delete_app_tag(self, tag_index):
         self.db_cursor.delete_tag(tag_index)
@@ -233,23 +306,27 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
     def unselect_app_tag(self, tag_name):
         current_login = self.edit_section.record_name
         self.db_cursor.unselect_tag(current_login, tag_name)
-
+        self.init_tags_list()
+        
 
     def new_user_record(self, login_name, login, password, urandom, tags):
         self.db_cursor.add_record_login(login_name, login, password, urandom)
         self.db_cursor.add_record_tag(login_name, tags)
-        self.update_logins_list()
+        self.reinit_records()
 
-    def update_logins_list(self):
+    def update_logins_list(self, tags_filter=False):
         self.logins_list.clear()
-        self.add_info_list_items()
+        if not tags_filter:
+            self.add_info_list_items()
+        else:
+            self.add_info_list_items(tags_filter)
         self.close_editing()
 
-    def init_logins_dict(self):
-        self.logins_dict = init_logins_dict()
-
-    def add_info_list_items(self):
-        self.init_logins_dict()
+    def add_info_list_items(self, tags_filter=False):
+        if not tags_filter:
+            self.logins_dict = init_logins_dict()
+        else:
+            self.logins_dict = init_logins_dict(tags_filter)
 
         # create custom widget with qmenu item, than add this widgets to our QListWidget
         for i in sorted(self.logins_dict.keys()):
@@ -294,4 +371,5 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
 
         self.db_cursor.edit_login(login_name, login, password, urandom, old_name)
         del self.logins_dict[old_name]
-        self.update_logins_list()
+        self.reinit_records()
+        

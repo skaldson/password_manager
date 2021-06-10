@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window_ui/greeting_window.ui'
+# Form implementation generated from reading ui file './window_ui/greeting_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -16,7 +16,7 @@ class Ui_greeting_window(object):
         greeting_window.setObjectName("greeting_window")
         greeting_window.resize(420, 470)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         greeting_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(greeting_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -31,7 +31,7 @@ class Ui_greeting_window(object):
         self.label.setSizePolicy(sizePolicy)
         self.label.setMaximumSize(QtCore.QSize(400, 400))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("window_ui/../images/download.png"))
+        self.label.setPixmap(QtGui.QPixmap("./window_ui/../images/download.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.image_layout.addWidget(self.label)
@@ -81,16 +81,6 @@ class Ui_greeting_window(object):
 
     def retranslateUi(self, greeting_window):
         _translate = QtCore.QCoreApplication.translate
-        greeting_window.setWindowTitle(_translate("greeting_window", "Hello"))
+        greeting_window.setWindowTitle(_translate("greeting_window", "WardoLinx"))
         self.sign_in_button.setText(_translate("greeting_window", "Sign Up"))
         self.sign_up_button.setText(_translate("greeting_window", "Sign In"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    greeting_window = QtWidgets.QDialog()
-    ui = Ui_greeting_window()
-    ui.setupUi(greeting_window)
-    greeting_window.show()
-    sys.exit(app.exec_())

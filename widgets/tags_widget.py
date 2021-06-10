@@ -44,7 +44,6 @@ class TagWidget(QWidget):
     def check_tags(cls, tags, colours, login_name=None):
         db_cursor = DBCursor.getInstance()
         login_tags = db_cursor.get_tags_by_login_name(login_name)
-        print(login_tags)
         exist_tags = db_cursor.get_tag_names
         tags_list = []
         for i in exist_tags:
@@ -58,7 +57,6 @@ class TagWidget(QWidget):
                 colour_id = db_cursor.get_colour_by_name(colour)
                 
                 colour_id = colour_id[0][0]
-                print(colour, colour_id)
                 if i in tags_list:
                     db_cursor.edit_tag(i, i, colour_id)
                 elif i not in tags_list:
@@ -97,7 +95,7 @@ class TagWidget(QWidget):
         tags_amount = self.tag_amount
         height_coefficient = 15
         if tags_amount % 2:
-            height = height_coefficient*tags_amount + 100
+            height = height_coefficient*tags_amount + 150
         else:
             height = (height_coefficient + 5)*tags_amount + 100
         self.setFixedHeight(height)
@@ -149,7 +147,7 @@ class TagWidget(QWidget):
                                         'rect_param': [x_pos, y_pos-tag_height, tag_width, tag_width]
                                     }
             all_text_width += tag_width
-            if (all_text_width + self.width()/2 + 20) > self.width():
+            if (all_text_width + self.width()/2 + 30) > self.width():
                 x_pos = start_x
                 y_pos += tag_height + 40
                 all_text_width = 0

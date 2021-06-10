@@ -12,10 +12,17 @@ from windows.utility.message_boxes import InfoBox
 from windows.utility.new_window_name import NewName
 
 
-def init_logins_dict():
+def init_logins_dict(tag_filter=False):
     db_cursor = DBCursor.getInstance()
     user_info = UserInfo.getInstance()
-    init_info = db_cursor.get_full_user_info()
+    if not tag_filter:
+        init_info = db_cursor.get_full_user_info()
+    else:
+        init_info = db_cursor.get_full_user_info(tag_filter)
+        for i in init_info:
+            tags = i[-1]
+            if tags == 0:
+                del init_info[init_info.index(i)]
     logins_dict = {}
 
     for i in init_info:
