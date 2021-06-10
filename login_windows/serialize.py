@@ -52,8 +52,6 @@ class Login(LoginSerialize):
         self.login_password = PasswordEdit(self)
         self.login_password.set_style()
         self.password_layout.addRow(QLabel('Password'), self.login_password)
-        self.user_name.setText('wardgib')
-        self.login_password.setText('Nfbycndtysq')
     
     @property
     def init_ui(self):
