@@ -21,7 +21,7 @@ class Ui_local_import(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 380, 249))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 376, 242))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -42,3 +42,13 @@ class Ui_local_import(object):
         local_import.setWindowTitle(_translate("local_import", "Local Import"))
         self.file_content.setText(_translate("local_import", "TextLabel"))
         self.accept_button.setText(_translate("local_import", "Accept"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    local_import = QtWidgets.QDialog()
+    ui = Ui_local_import()
+    ui.setupUi(local_import)
+    local_import.show()
+    sys.exit(app.exec_())

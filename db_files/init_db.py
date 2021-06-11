@@ -83,8 +83,8 @@ class InItDb:
                             (5, 'brown'),
                             (6, 'green'),
                             (7, 'yellow'),
-                            (8, 'coral'),
-                            (9, 'magenta');"""
+                            (8, '#007fff'),
+                            (9, '#ee82ee');"""
 
         self.db_cursor.execute(query_insert)
         self.db_connector.commit()

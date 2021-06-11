@@ -77,18 +77,18 @@ class MainWindow(QMainWindow, main_window.Ui_main_window):
             temp.widget_label.setText(tag_text)
             if name not in self.tags_filter:
                 temp.widget_label.setStyleSheet("QLabel {\n"
-                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "font: 10pt \"Fira Sans Semi-Light\";\n"
                                         "color: %s;\n"
                                         "}" % tag_colour)
             elif self.tags_filter[name]:
                 temp.widget_label.setStyleSheet("QLabel {\n"
-                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "font: 10pt \"Fira Sans Semi-Light\";\n"
                                         "font-weight: bold;\n"
                                         "color: %s;\n"
                                         "}" % tag_colour)
             else:
                 temp.widget_label.setStyleSheet("QLabel {\n"
-                                        "font: 11pt \"Fira Sans Semi-Light\";\n"
+                                        "font: 10pt \"Fira Sans Semi-Light\";\n"
                                         "font-weight: normal;\n"
                                         "color: %s;\n"
                                         "}" % tag_colour)

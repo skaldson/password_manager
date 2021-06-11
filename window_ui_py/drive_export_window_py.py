@@ -23,13 +23,14 @@ class Ui_drive_window(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.files_list = QtWidgets.QListWidget(drive_window)
+        self.files_list.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.files_list.setObjectName("files_list")
         self.horizontalLayout.addWidget(self.files_list)
         self.scroll_area = QtWidgets.QScrollArea(drive_window)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 252, 246))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 248, 236))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.scrollAreaWidgetContents)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -68,3 +69,13 @@ class Ui_drive_window(object):
         drive_window.setWindowTitle(_translate("drive_window", "Drive Import"))
         self.file_content.setText(_translate("drive_window", "TextLabel"))
         self.submit_button.setText(_translate("drive_window", "Submit"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    drive_window = QtWidgets.QDialog()
+    ui = Ui_drive_window()
+    ui.setupUi(drive_window)
+    drive_window.show()
+    sys.exit(app.exec_())

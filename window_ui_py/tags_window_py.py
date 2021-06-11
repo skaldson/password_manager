@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window_ui/tags_window.ui'
+# Form implementation generated from reading ui file './window_ui/tags_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -16,7 +16,7 @@ class Ui_tags_window(object):
         tags_window.setObjectName("tags_window")
         tags_window.resize(333, 148)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         tags_window.setWindowIcon(icon)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(tags_window)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -54,7 +54,7 @@ class Ui_tags_window(object):
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout_2.addWidget(self.frame)
         self.frame_2 = QtWidgets.QFrame(tags_window)
-        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_2.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2.setObjectName("frame_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.frame_2)

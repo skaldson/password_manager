@@ -21,7 +21,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QListWidget" name="files_list"/>
+      <widget class="QListWidget" name="files_list">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QScrollArea" name="scroll_area">
@@ -33,8 +37,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>252</width>
-          <height>246</height>
+          <width>248</width>
+          <height>236</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">

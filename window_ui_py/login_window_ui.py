@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window_ui/login.ui'
+# Form implementation generated from reading ui file './window_ui/login.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -19,12 +19,12 @@ class Ui_login_dialog(object):
         font.setPointSize(12)
         login_dialog.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./window_ui/../images/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         login_dialog.setWindowIcon(icon)
         self.verticalLayout = QtWidgets.QVBoxLayout(login_dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.photo_frame = QtWidgets.QFrame(login_dialog)
-        self.photo_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.photo_frame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.photo_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.photo_frame.setObjectName("photo_frame")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.photo_frame)
@@ -39,7 +39,7 @@ class Ui_login_dialog(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.exit_user_button = QtWidgets.QToolButton(self.photo_frame)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("window_ui/../images/exit_door.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("./window_ui/../images/exit_door.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.exit_user_button.setIcon(icon1)
         self.exit_user_button.setIconSize(QtCore.QSize(20, 20))
         self.exit_user_button.setObjectName("exit_user_button")
@@ -86,7 +86,7 @@ class Ui_login_dialog(object):
 "    background-color:grey;\n"
 "}")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("window_ui/../images/pencil.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("./window_ui/../images/pencil.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.edit_user_button.setIcon(icon2)
         self.edit_user_button.setIconSize(QtCore.QSize(20, 20))
         self.edit_user_button.setPopupMode(QtWidgets.QToolButton.DelayedPopup)
@@ -100,7 +100,7 @@ class Ui_login_dialog(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.verticalLayout.addWidget(self.photo_frame)
         self.frame = QtWidgets.QFrame(login_dialog)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frame)

@@ -126,6 +126,9 @@
    </item>
    <item>
     <widget class="QScrollArea" name="scroll_tag_area">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
@@ -134,8 +137,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>410</width>
-        <height>188</height>
+        <width>412</width>
+        <height>175</height>
        </rect>
       </property>
       <widget class="TagWidget" name="tag_widget" native="true">

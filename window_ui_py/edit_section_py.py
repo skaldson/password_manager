@@ -76,10 +76,11 @@ class Ui_Form(object):
         self.data_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.login)
         self.verticalLayout.addLayout(self.data_layout)
         self.scroll_tag_area = QtWidgets.QScrollArea(Form)
+        self.scroll_tag_area.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.scroll_tag_area.setWidgetResizable(True)
         self.scroll_tag_area.setObjectName("scroll_tag_area")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 410, 188))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 412, 175))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.tag_widget = TagWidget(self.scrollAreaWidgetContents)
         self.tag_widget.setGeometry(QtCore.QRect(140, 30, 120, 80))
@@ -111,3 +112,13 @@ class Ui_Form(object):
         self.label_2.setText(_translate("Form", "Login"))
         self.sudmit_editing.setText(_translate("Form", "Submit"))
 from widgets.tags_widget import TagWidget
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Form = QtWidgets.QWidget()
+    ui = Ui_Form()
+    ui.setupUi(Form)
+    Form.show()
+    sys.exit(app.exec_())
